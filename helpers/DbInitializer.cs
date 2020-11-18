@@ -30,7 +30,10 @@ namespace leashed.helpers
                     var parks = LoadParkData.loadData();
                     Console.WriteLine( "Parks Loaded: " +parks[1].Name +" " + parks[2].Name );
                     try{
-                    if(context.ParkItems.Any(x => x.Name == parks[0].Name)) return;
+                    if(context.ParkItems.Any(x => x.Name == parks[0].Name)){
+                        Console.WriteLine( "Parks exist!!!!!!!!!!!!!!!!!!!");
+                        return;
+                    }
                     context.ParkItems.AddRange(parks);
                     context.SaveChanges ();
                     } catch(InvalidOperationException e){
