@@ -63,13 +63,13 @@ namespace leashApi
                     options.AddPolicy("IsAdmin", policy => policy.Requirements.Add(new ILeashedAuthorizationHandlerRequirement()));
                 });
                 services.AddSingleton<IAuthorizationHandler, ILeashedAuthorizationHandler>();
-
+            string connectionString = null;
             Console.WriteLine("About to make the string for db");
             //Console.WriteLine(Helpers.connectionStringMaker());
             string envVar = Environment.GetEnvironmentVariable("DATABASE_URL");
             if(!string.IsNullOrEmpty(envVar)){
                 Console.WriteLine("Getting connection String from DATABASE_URL");
-                string connectionString = null;
+                
                 //parse database URL. Format is postgres://<username>:<password>@<host>/<dbname>
                 var uri = new Uri(envVar);
                 var username = uri.UserInfo.Split(':')[0];
@@ -99,7 +99,7 @@ namespace leashApi
                 try{ //trying to create and connecft with environemnt variables. This will work build only.
                     Console.WriteLine(" Attempting connection to db with environment vars ");
 
-                    String connectionString = Helpers.connectionStringMaker();
+                    connectionString = Helpers.connectionStringMaker();
                     Console.WriteLine(" -- we are now past thrown error ");
                     services.AddDbContext<ParkContext>(opt =>
                     opt.UseNpgsql(connectionString));
@@ -111,7 +111,7 @@ namespace leashApi
                     Console.WriteLine(" -- Caught exception. opening connection to local db " + e);
                     Console.WriteLine(" -- --");
                     Console.WriteLine(" -- now beginning to build string from config files");
-                    var connectionString = Configuration["PostgreSql:ConnectionString"];
+                    connectionString = Configuration["PostgreSql:ConnectionString"];
                     var dbPassword = Configuration["PostgreSql:DbPassword"];
                     Console.WriteLine("connection string: " + connectionString);
                     Console.WriteLine("db password: " + dbPassword);
