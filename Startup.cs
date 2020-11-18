@@ -66,36 +66,65 @@ namespace leashApi
 
             Console.WriteLine("About to make the string for db");
             //Console.WriteLine(Helpers.connectionStringMaker());
+            string envVar = Environment.GetEnvironmentVariable("DATABASE_URL");
+            if(!string.IsNullOrEmpty(envVar)){
+                Console.WriteLine("Getting connection String from DATABASE_URL");
+                string connectionString = null;
+                //parse database URL. Format is postgres://<username>:<password>@<host>/<dbname>
+                var uri = new Uri(envVar);
+                var username = uri.UserInfo.Split(':')[0];
+                var password = uri.UserInfo.Split(':')[1];
+                connectionString = 
+                "; Database=" + uri.AbsolutePath.Substring(1) +
+                "; Username=" + username +
+                "; Password=" + password + 
+                "; Port=" + uri.Port +
+                "; SSL Mode=Require; Trust Server Certificate=true;";
 
-            try{ //trying to create and connecft with environemnt variables. This will work build only.
-                Console.WriteLine(" Attempting connection to db with environment vars ");
+                try{
+                    
+                    services.AddDbContext<ParkContext>(opt =>
+                    opt.UseNpgsql(connectionString));
+                    services.AddControllers();
+                    services.AddScoped<IDbInitializer, DbInitializer> ();
 
-                String connectionString = Helpers.connectionStringMaker();
-                Console.WriteLine(" -- we are now past thrown error ");
-                services.AddDbContext<ParkContext>(opt =>
-                opt.UseNpgsql(connectionString));
-                services.AddControllers();
-                services.AddScoped<IDbInitializer, DbInitializer> ();
+                } catch(InvalidOperationException e){
+                    Console.WriteLine(" -- Caught exception. opening connection to local db " + e);
+                    Console.WriteLine(" -- --");
+                }
 
-            } catch(InvalidOperationException e){
+            }
+            else{
+                try{ //trying to create and connecft with environemnt variables. This will work build only.
+                    Console.WriteLine(" Attempting connection to db with environment vars ");
 
-                Console.WriteLine(" -- Caught exception. opening connection to local db " + e);
-                Console.WriteLine(" -- --");
-                Console.WriteLine(" -- now beginning to build string from config files");
-                var connectionString = Configuration["PostgreSql:ConnectionString"];
-                var dbPassword = Configuration["PostgreSql:DbPassword"];
-                Console.WriteLine("connection string: " + connectionString);
-                Console.WriteLine("db password: " + dbPassword);
-                var builder = new NpgsqlConnectionStringBuilder(connectionString){
-                    Password = dbPassword
-                };
-                services.AddDbContext<ParkContext>(opt =>
-                opt.UseNpgsql(builder.ConnectionString));
-                services.AddControllers();
-                services.AddScoped<IDbInitializer, DbInitializer> ();
-                services.AddScoped<IPictureRepository, PictureRepository> ();
-            
-            } 
+                    String connectionString = Helpers.connectionStringMaker();
+                    Console.WriteLine(" -- we are now past thrown error ");
+                    services.AddDbContext<ParkContext>(opt =>
+                    opt.UseNpgsql(connectionString));
+                    services.AddControllers();
+                    services.AddScoped<IDbInitializer, DbInitializer> ();
+
+                } catch(InvalidOperationException e){
+
+                    Console.WriteLine(" -- Caught exception. opening connection to local db " + e);
+                    Console.WriteLine(" -- --");
+                    Console.WriteLine(" -- now beginning to build string from config files");
+                    var connectionString = Configuration["PostgreSql:ConnectionString"];
+                    var dbPassword = Configuration["PostgreSql:DbPassword"];
+                    Console.WriteLine("connection string: " + connectionString);
+                    Console.WriteLine("db password: " + dbPassword);
+                    var builder = new NpgsqlConnectionStringBuilder(connectionString){
+                        Password = dbPassword
+                    };
+                    services.AddDbContext<ParkContext>(opt =>
+                    opt.UseNpgsql(builder.ConnectionString));
+                    services.AddControllers();
+                    services.AddScoped<IDbInitializer, DbInitializer> ();
+                    services.AddScoped<IPictureRepository, PictureRepository> ();
+                
+                } 
+            }
 
             //services.AddControllers();
         
