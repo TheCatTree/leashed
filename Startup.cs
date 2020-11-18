@@ -75,7 +75,7 @@ namespace leashApi
                 var username = uri.UserInfo.Split(':')[0];
                 var password = uri.UserInfo.Split(':')[1];
                 connectionString = 
-                "Host = " + uri.AbsolutePath.Substring(0) +
+                "Host = " + uri.Host +
                 "; Database=" + uri.AbsolutePath.Substring(1) +
                 "; Username=" + username +
                 "; Password=" + password + 
