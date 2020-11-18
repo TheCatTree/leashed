@@ -80,7 +80,8 @@ namespace leashApi
                 "; Password=" + password + 
                 "; Port=" + uri.Port +
                 "; SSL Mode=Require; Trust Server Certificate=true;";
-                Console.WriteLine(" DATABASE_URL = " + connectionString);
+                Console.WriteLine(" DATABASE_URL = " + envVar);
+                Console.WriteLine(" connectionString = " + connectionString);
 
                 try{
                     
