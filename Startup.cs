@@ -117,6 +117,7 @@ namespace leashApi
                    Console.WriteLine("--about to run migration");
                 //EnsureCreated makes the database and returns true if it dose can not then use migrations
                 context.Database.Migrate();
+                }
 
             } catch (InvalidOperationException e ) {
                 Console.WriteLine("catched context error: " + e);
