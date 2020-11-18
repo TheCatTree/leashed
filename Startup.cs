@@ -150,8 +150,10 @@ namespace leashApi
                 }
 
             } catch (InvalidOperationException e ) {
+                Console.WriteLine("In database creation block.");
                 Console.WriteLine("catched context error: " + e);
             } catch (Exception e) {
+                Console.WriteLine("In database creation block.");
                 Console.WriteLine("Caught random exception: " + e);
             }
 
