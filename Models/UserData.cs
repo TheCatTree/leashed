@@ -15,10 +15,12 @@ namespace leashApi.Models
         [StringLength(255)]
         public string TokenSub { get; set; }
         public ICollection<Picture> Pictures {get; set;}
+        public ICollection<Dog> Dogs {get; set;}
 
         public UserData()
         {
             Pictures = new Collection<Picture>();
+            Dogs = new Collection<Dog>();
         }
 
     }
