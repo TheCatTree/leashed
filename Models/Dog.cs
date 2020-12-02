@@ -11,6 +11,7 @@ namespace leashApi.Models
         [Required]
         [StringLength(255)]
         public string Name { get; set; }
+        [Required]
         public int UserDataId { get; set;}
         public IList<PictureDogJoin> PictureDogJoins {get; set;}
 
