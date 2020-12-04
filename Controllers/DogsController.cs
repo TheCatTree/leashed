@@ -70,8 +70,7 @@ namespace leashApi.Controllers
              
             _context.Dogs.Add(dog);
             await _context.SaveChangesAsync();
-            var id = dogData.Id;
-            dog = await _context.Dogs.FindAsync(id);
+            dog = await _context.Dogs.FindAsync(dog.Id);
             return Ok(dog);
         }
 

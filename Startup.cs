@@ -45,7 +45,7 @@ namespace leashApi
                 services.AddCors(options =>  
                 {  
                     options.AddPolicy("TestApp",  
-                    builder => builder.WithOrigins("https://localhost:7001","https://leash-test-spa.herokuapp.com").AllowAnyHeader().AllowAnyMethod());  
+                    builder => builder.WithOrigins("https://localhost:7001","https://leash-test-spa.herokuapp.com" , "http://localhost:7001","http://leash-test-spa.herokuapp.com").AllowAnyHeader().AllowAnyMethod());  
                 });
 
                 services.AddAuthentication(options =>
