@@ -2,7 +2,7 @@ version: '3.7'
 
 volumes:
     pgdata:
-    s3ninja:
+  #  s3ninja:
 
 
 services: 
@@ -11,7 +11,7 @@ services:
 
         command: postgres -c log_connections=on -c log_disconnections=on #-c log_statement=all
 
-        container_name: leashapi_postgres_1
+        container_name: leashed_postgres_1
 
         restart: always
         env_file: 
@@ -61,17 +61,16 @@ services:
             - "5001:5001"
             - "5000:5000"
 
-    s3:
-        image: scireum/s3-ninja:6.5.2
-        container_name: s3Ninja
+ #   s3:
+#        image: scireum/s3-ninja:6.5.2
+ #       container_name: s3Ninja
 
-        volumes:
-            - s3ninja:/home/sirius/data
+  #      volumes:
+   #         - s3ninja:/home/sirius/data
 
-        ports:
-            - 9444:9000
-
-       
+    #    ports:
+     #       - 9444:9000
+    
 
         
         
