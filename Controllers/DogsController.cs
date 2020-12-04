@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authentication;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Diagnostics;
+using leashed.Controllers.Resources;
 
 namespace leashApi.Controllers
 {
@@ -51,7 +52,7 @@ namespace leashApi.Controllers
 
         [HttpPost]
         [Authorize]
-        public async Task<ActionResult<Dog>> Postdog([FromBody] Dog dogData)
+        public async Task<ActionResult<Dog>> Postdog([FromBody] DogResource dogData)
         {
             Console.WriteLine("Dog post method.");
             if (!ModelState.IsValid){
@@ -60,11 +61,17 @@ namespace leashApi.Controllers
 
             }
                
-
-            _context.Dogs.Add(dogData);
+            
+            var user = await _context.UserData.FindAsync(dogData.UserDataId);
+            var dog = new Dog{
+             UserDataId = user.Id,
+                Name = dogData.name
+            };
+             
+            _context.Dogs.Add(dog);
             await _context.SaveChangesAsync();
             var id = dogData.Id;
-            var dog = await _context.Dogs.FindAsync(id);
+            dog = await _context.Dogs.FindAsync(id);
             return Ok(dog);
         }
 
