@@ -53,8 +53,13 @@ namespace leashApi.Controllers
         [Authorize]
         public async Task<ActionResult<Dog>> Postdog([FromBody] Dog dogData)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            Console.WriteLine("Dog post method.");
+            if (!ModelState.IsValid){
+                 Console.WriteLine("Invalid model state.");
+                 return BadRequest(ModelState);
+
+            }
+               
 
             _context.Dogs.Add(dogData);
             await _context.SaveChangesAsync();
