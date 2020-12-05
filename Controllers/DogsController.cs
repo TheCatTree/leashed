@@ -44,9 +44,13 @@ namespace leashApi.Controllers
         [HttpGet("/user/{id}/dogs")]
         public async Task<ActionResult<IEnumerable<Dog>>> GetUsersDogs(int id){
 
-            return await _context.Dogs.Where( dog => 
-                dog.Id == id
+            var dogs = await _context.Dogs.Where( dog => 
+                dog.UserDataId == id
             ).ToListAsync();
+            Console.WriteLine("---------------------------------------------------------------------------------------------------------");
+            Console.WriteLine(dogs.Count());
+            Console.WriteLine("---------------------------------------------------------------------------------------------------------");
+            return Ok(dogs);
         }
        
 
