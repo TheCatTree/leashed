@@ -3,9 +3,15 @@ using System.Linq;
 using Microsoft.Extensions.Configuration;
 using System.Collections;
 using leashApi.Models;
-
+using System.Collections.Generic;
+using leashed.Controllers.Resources;
+using System.Net.Http;
+using Google.Cloud.Storage.V1;
+using Google.Apis.Auth.OAuth2;
+using System.IO;
+ 
 public class Helpers{
-
+    
     public enum AccessLevel{
             read,
             edit
@@ -58,5 +64,41 @@ public class Helpers{
  
             }
         }
-    }
+         public static secureURLResource makeImageURL(string key, double duration, HttpMethod method)
+        {   
+            Dictionary<string, IEnumerable<string>> contentHeaders;
+            if(method == HttpMethod.Get){
+
+                contentHeaders = new Dictionary<string, IEnumerable<string>> 
+                    {
+                        
+                    };
+            }else {
+                contentHeaders = new Dictionary<string, IEnumerable<string>> 
+                    {
+                        { "Content-Type", new[] { "image/*" } }
+                    };
+            }
+
+            UrlSigner.RequestTemplate requestTemplate = UrlSigner.RequestTemplate
+            .FromBucket("dev-growler-images")
+            .WithObjectName(key)
+            .WithHttpMethod(method)
+            .WithContentHeaders(contentHeaders);
+
+            ServiceAccountCredential credential;
+            using (FileStream fs = File.OpenRead(Environment.GetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS")))
+            {
+                credential = ServiceAccountCredential.FromServiceAccountData(fs);
+            }
+            UrlSigner.Options options = UrlSigner.Options.FromDuration(TimeSpan.FromHours(duration)).WithSigningVersion(SigningVersion.V4);
+            
+            UrlSigner urlSigner = UrlSigner.FromServiceAccountCredential(credential);
+            string url = urlSigner.Sign(requestTemplate, options);
+            //var url = GeneratePreSignedURL(key, s3BucketName, 1);
+            secureURLResource surl = new secureURLResource();
+            surl.URL = url;
+            return surl;
+        }
+ }
     

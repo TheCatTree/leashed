@@ -2,9 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IdentityModel.Tokens.Jwt;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Amazon.S3.Model;
+using Google.Apis.Auth.OAuth2;
+using Google.Cloud.Storage.V1;
 using leashApi.Models;
 using leashed.Controllers.Resources;
 using leashed.helpers;
@@ -21,6 +25,14 @@ namespace leashApi.Controllers
     [EnableCors("TestApp")] 
     public class PicturesController : Controller
     {
+
+        private string gcsBucketName = "dev-growler-images";
+
+        private string gcsProjectId = "leashed-1585625476385";
+
+        private  Google.Apis.Storage.v1.Data.Bucket gcsBucket;
+
+        private static StorageClient gcsClient;
 
         private readonly ParkContext _context;
         private readonly IPictureRepository _pictureRepository;
@@ -115,6 +127,18 @@ namespace leashApi.Controllers
             return await _pictureRepository.setupBucket();
         }
 
+
+        private secureURLResource uploadImageURL(string key, double duration)
+        {   
+            return Helpers.makeImageURL(key, duration, HttpMethod.Put);
+        }
+
+        private secureURLResource getImageURL(string key, double duration)
+        {   
+            return Helpers.makeImageURL(key, duration, HttpMethod.Get);
+        }
+
+        
 
      
     }
