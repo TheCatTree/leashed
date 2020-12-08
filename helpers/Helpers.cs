@@ -95,7 +95,7 @@ public class Helpers{
                     }
             }
             else{
-                using (FileStream fs = File.OpenRead(Environment.GetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS")))
+                using (FileStream fs = File.OpenRead("../" + Environment.GetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS")))
                     {
                         credential = ServiceAccountCredential.FromServiceAccountData(fs);
                     }    
