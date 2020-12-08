@@ -42,9 +42,15 @@ services:
             - type: bind
               source: /leashed/Certificate
               target: /Certificate
+
+            - type: bind
+              source: /leashed/keys
+              target: /keys
+
         environment: 
             - Kestrel__Certificates__Default__Path=/Certificate/ServerSSL.pfx
             - Kestrel__Certificates__Default__Password=Test123
+            - GOOGLE_APPLICATION_CREDENTIALS=/keys/leashed-158.json
 
 
 

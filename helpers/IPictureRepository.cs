@@ -1,6 +1,7 @@
 using Amazon;
 using Amazon.S3;
 using Amazon.S3.Model;
+using leashed.Controllers.Resources;
 using System;
 using System.IO;
 using System.Net;
@@ -10,14 +11,14 @@ namespace leashed.helpers
 {
     public interface IPictureRepository
     {
-        string getImageUrl(string key);
+        public Task<secureURLResource> getImageURL(string key, double duration);
 
 
          bool canAccessImage(string id);
 
         Task<PutBucketResponse> setupBucket();
 
-        Task<string> uploadImageURL(string key, double duration);
+        Task<secureURLResource> uploadImageURL(string key, double duration);
 
 
     }
