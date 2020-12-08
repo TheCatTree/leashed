@@ -9,7 +9,9 @@ using System.Net.Http;
 using Google.Cloud.Storage.V1;
 using Google.Apis.Auth.OAuth2;
 using System.IO;
- 
+using Newtonsoft.Json.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
+
 public class Helpers{
     
     public enum AccessLevel{
@@ -85,12 +87,22 @@ public class Helpers{
             .WithObjectName(key)
             .WithHttpMethod(method)
             .WithContentHeaders(contentHeaders);
-
             ServiceAccountCredential credential;
-            using (FileStream fs = File.OpenRead(Environment.GetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS")))
-            {
-                credential = ServiceAccountCredential.FromServiceAccountData(fs);
+            if(File.Exists(Environment.GetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS"))){
+                using (FileStream fs = File.OpenRead(Environment.GetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS")))
+                    {
+                        credential = ServiceAccountCredential.FromServiceAccountData(fs);
+                    }
             }
+            else{
+                MemoryStream credentialStream = new MemoryStream();
+                BinaryFormatter binSerializer = new BinaryFormatter();
+                binSerializer.Serialize(credentialStream,JObject.Parse(Environment.GetEnvironmentVariable("GOOGLE_CREDENTIALS")));
+
+                credential = ServiceAccountCredential.FromServiceAccountData(credentialStream);
+                
+            }
+            
             UrlSigner.Options options = UrlSigner.Options.FromDuration(TimeSpan.FromHours(duration)).WithSigningVersion(SigningVersion.V4);
             
             UrlSigner urlSigner = UrlSigner.FromServiceAccountCredential(credential);
