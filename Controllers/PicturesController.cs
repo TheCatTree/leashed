@@ -35,12 +35,11 @@ namespace leashApi.Controllers
         private static StorageClient gcsClient;
 
         private readonly ParkContext _context;
-        private readonly IPictureRepository _pictureRepository;
-
-        public PicturesController(ParkContext context, IPictureRepository pictureRepository)
+        
+        public PicturesController(ParkContext context)
         {
             _context = context;
-            _pictureRepository = pictureRepository;
+            
         }
 
         [HttpGet("upload/{name}")]
@@ -124,7 +123,7 @@ namespace leashApi.Controllers
         {
            
            
-            return await _pictureRepository.setupBucket();
+            return StatusCode(403, $"Removed"); 
         }
 
 
