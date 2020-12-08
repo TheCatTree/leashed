@@ -95,12 +95,10 @@ public class Helpers{
                     }
             }
             else{
-                MemoryStream credentialStream = new MemoryStream();
-                BinaryFormatter binSerializer = new BinaryFormatter();
-                binSerializer.Serialize(credentialStream,JObject.Parse(Environment.GetEnvironmentVariable("GOOGLE_CREDENTIALS")));
-
-                credential = ServiceAccountCredential.FromServiceAccountData(credentialStream);
-                
+                using (FileStream fs = File.OpenRead(Environment.GetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS")))
+                    {
+                        credential = ServiceAccountCredential.FromServiceAccountData(fs);
+                    }    
             }
             
             UrlSigner.Options options = UrlSigner.Options.FromDuration(TimeSpan.FromHours(duration)).WithSigningVersion(SigningVersion.V4);
