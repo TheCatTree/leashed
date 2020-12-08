@@ -86,12 +86,12 @@ namespace leashed.helpers
 
         }
 
-        public Task<secureURLResource> uploadImageURL(string key, double duration)
+        public secureURLResource uploadImageURL(string key, double duration)
         {   
             return makeImageURL(key, duration, HttpMethod.Put);
         }
 
-        public Task<secureURLResource> getImageURL(string key, double duration)
+        public secureURLResource getImageURL(string key, double duration)
         {   
             return makeImageURL(key, duration, HttpMethod.Get);
         }
@@ -110,7 +110,7 @@ namespace leashed.helpers
            return url;
         }
 
-        public Task<secureURLResource> makeImageURL(string key, double duration, HttpMethod method)
+        public secureURLResource makeImageURL(string key, double duration, HttpMethod method)
         {   
             Dictionary<string, IEnumerable<string>> contentHeaders;
             if(method == HttpMethod.Get){
@@ -144,7 +144,7 @@ namespace leashed.helpers
             //var url = GeneratePreSignedURL(key, s3BucketName, 1);
             secureURLResource surl = new secureURLResource();
             surl.URL = url;
-            return Task.FromResult(surl);
+            return surl;
         }
     }
 }

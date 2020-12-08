@@ -11,14 +11,14 @@ namespace leashed.helpers
 {
     public interface IPictureRepository
     {
-        public Task<secureURLResource> getImageURL(string key, double duration);
+        secureURLResource getImageURL(string key, double duration);
 
 
          bool canAccessImage(string id);
 
         Task<PutBucketResponse> setupBucket();
 
-        Task<secureURLResource> uploadImageURL(string key, double duration);
+        secureURLResource uploadImageURL(string key, double duration);
 
     }
 }
