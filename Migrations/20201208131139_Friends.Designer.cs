@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using leashApi.Models;
@@ -9,9 +10,10 @@ using leashApi.Models;
 namespace leashApi.Migrations
 {
     [DbContext(typeof(ParkContext))]
-    partial class ParkContextModelSnapshot : ModelSnapshot
+    [Migration("20201208131139_Friends")]
+    partial class Friends
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -91,9 +93,6 @@ namespace leashApi.Migrations
                         .HasColumnType("character varying(255)")
                         .HasMaxLength(255);
 
-                    b.Property<bool>("IsPublic")
-                        .HasColumnType("boolean");
-
                     b.Property<string>("Key")
                         .IsRequired()
                         .HasColumnType("character varying(255)")
@@ -101,12 +100,6 @@ namespace leashApi.Migrations
 
                     b.Property<int>("UserDataId")
                         .HasColumnType("integer");
-
-                    b.Property<string[]>("canEdit")
-                        .HasColumnType("text[]");
-
-                    b.Property<string[]>("canRead")
-                        .HasColumnType("text[]");
 
                     b.HasKey("Id");
 

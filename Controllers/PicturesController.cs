@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace leashApi.Controllers
 {
     [Route("api/[controller]")]
@@ -33,18 +34,6 @@ namespace leashApi.Controllers
         [HttpGet("upload/{name}")]
         public async Task<ActionResult<secureURLResource>> GetUploadURL(string name)
         {
-            
-           // await _pictureRepository.setupBucket();
-           // 
-           // var signedURL = await _pictureRepository.uploadImageURL(GUID, 12);
-           // var picture = new Picture();
-           // picture.GivenName = name;
-           // picture.FileName = GUID;
-           // picture.URL = signedURL;
-           // 
-           // 
-           // Console.WriteLine("---------------------Picture Created-----------------------");
-           // Console.WriteLine(signedURL);
            var GUID = Guid.NewGuid();
            var key = "userimages/" + GUID.ToString();
             var picture = new Picture();
@@ -68,6 +57,20 @@ namespace leashApi.Controllers
         public async Task<ActionResult<secureURLResource>> GetImageURL(int id)
         {
             var picture = await _context.Pictures.Where(x => x.Id == id).FirstOrDefaultAsync();
+            if(!picture.IsPublic)
+            {
+                var token = await HttpContext.GetTokenAsync("access_token");
+                var securityTokenHandler = new JwtSecurityTokenHandler();
+                var decriptedToken = securityTokenHandler.ReadJwtToken(token);
+                var claims = decriptedToken.Claims;
+                var sub = claims.First(c => c.Type == "sub").Value;
+                var user = await _context.UserData.Where(x => x.TokenSub == sub).FirstOrDefaultAsync();
+                
+
+                if(!Helpers.canAccess(picture,user,Helpers.AccessLevel.read)){
+                    return StatusCode(403, $"Access Denied"); 
+                }
+            }
             Console.WriteLine("---------------------get picture-----------------------");
 
             secureURLResource pictureResource = await _pictureRepository.uploadImageURL(picture.Key, 1);
@@ -90,6 +93,12 @@ namespace leashApi.Controllers
             Console.WriteLine("---------------------get pictures-----------------------");
             var pictures = await _context.Pictures.Where(x => x.UserDataId == user.Id).ToListAsync();
             foreach(Picture picture in pictures){
+                if(!picture.IsPublic)
+                {   
+                    if(!Helpers.canAccess(picture,user,Helpers.AccessLevel.read)){
+                        continue; 
+                    }
+                }
                 var p = picture.Key;
                 var x = await _pictureRepository.getImageURL(p, 1);
                 x.Id = picture.Id;

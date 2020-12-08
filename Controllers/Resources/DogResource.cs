@@ -7,4 +7,13 @@ namespace leashed.Controllers.Resources
         public int UserDataId {get; set;}
 
     }
+
+    public class UserResource
+    {
+        public int Id {get; set;}
+        public string name {get; set;}
+       
+
+    }
+
 }

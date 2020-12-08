@@ -2,10 +2,27 @@ using System;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 using System.Collections;
+using leashApi.Models;
 
+public class Helpers{
 
-    public class Helpers{
+    public enum AccessLevel{
+            read,
+            edit
+        }
 
+        public static bool canAccess(Picture picture, UserData user, AccessLevel accessLevel){
+            if(accessLevel == AccessLevel.read){
+                if(picture.IsPublic) return true;
+                if(picture.UserDataId == user.Id) return true;
+                if(picture.canRead.Contains(user.TokenSub))return true;
+            }
+            if(accessLevel == AccessLevel.edit){
+                if(picture.UserDataId == user.Id) return true;
+                if(picture.canEdit.Contains(user.TokenSub))return true;
+            }
+            return false;
+        }
         public static string connectionStringMaker()
         {
             Console.WriteLine("--in connection string helper method" );

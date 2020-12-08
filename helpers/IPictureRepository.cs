@@ -20,6 +20,5 @@ namespace leashed.helpers
 
         Task<secureURLResource> uploadImageURL(string key, double duration);
 
-
     }
 }
