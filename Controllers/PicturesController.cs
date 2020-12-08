@@ -60,7 +60,7 @@ namespace leashApi.Controllers
             picture.UserDataId = user.Id;
             _context.Pictures.Add(picture);
             await _context.SaveChangesAsync();
-            secureURLResource signedURL =  _pictureRepository.uploadImageURL(key, 1);
+            secureURLResource signedURL =  uploadImageURL(key, 1);
             signedURL.Id = picture.Id;
             return  signedURL;
         }
@@ -85,7 +85,7 @@ namespace leashApi.Controllers
             }
             Console.WriteLine("---------------------get picture-----------------------");
 
-            secureURLResource pictureResource = _pictureRepository.uploadImageURL(picture.Key, 1);
+            secureURLResource pictureResource = uploadImageURL(picture.Key, 1);
             pictureResource.Id = picture.Id;
 
             return pictureResource;
@@ -112,7 +112,7 @@ namespace leashApi.Controllers
                     }
                 }
                 var p = picture.Key;
-                var x = _pictureRepository.getImageURL(p, 1);
+                var x = getImageURL(p, 1);
                 x.Id = picture.Id;
                 Surls.Add(x);
             }
