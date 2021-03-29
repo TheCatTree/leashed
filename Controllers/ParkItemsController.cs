@@ -48,13 +48,27 @@ namespace leashApi.Controllers
             return parkItem;
         }
 
+        // GET: api/ParkItems/Name/"park name"
+        [HttpGet("Name/{name}")]
+        public async Task<ActionResult<ParkItem>> GetParkItemByName(string name)
+        {
+            var parkItem = await _context.ParkItems.FirstOrDefaultAsync(x => x.Name == name);
+
+            if (parkItem == null)
+            {
+                return NotFound();
+            }
+
+            return parkItem;
+        }
+
         // GET: api/ParkItems/suburb/city+name
         //Get list of parks by suburb
-        [HttpGet("suburb/{id}")]
-        public async Task<ActionResult<IEnumerable<ParkItem>>> GetParkSuburbItem(String id)
+        [HttpGet("suburb/{suburb}")]
+        public async Task<ActionResult<IEnumerable<ParkItem>>> GetParkSuburbItem(String suburb)
         {
             var parkItem = await _context.ParkItems.Where( li => 
-                li.Suburb == id
+                li.Suburb == suburb
             ).ToListAsync();
          
             if (parkItem.Count == 0)

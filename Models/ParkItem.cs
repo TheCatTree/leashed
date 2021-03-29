@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace leashApi.Models
@@ -19,5 +20,11 @@ namespace leashApi.Models
         [Required]
         [StringLength(255)]
         public string Country { get; set; }
+
+        public IList<UserData> ParkGoers {get; set; }
+
+        public ParkItem(){
+            ParkGoers = new List<UserData>();
+        }
     }
 }

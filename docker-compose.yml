@@ -36,15 +36,15 @@ services:
 
         volumes:
             - type: bind
-              source: /leashed/Assets
+              source: C:\Users\TCT\Desktop\NSProjects\leashed\Assets
               target: /Assets
 
             - type: bind
-              source: /leashed/Certificate
+              source: C:\Users\TCT\Desktop\NSProjects\leashed\Certificate
               target: /Certificate
 
             - type: bind
-              source: /leashed/keys
+              source: C:\Users\TCT\Desktop\NSProjects\leashed\keys
               target: /keys
 
         environment: 
@@ -60,7 +60,7 @@ services:
             dockerfile: dockerfile-tcpdump
         volumes:
             - type: bind
-              source: /leashed/pcap
+              source: C:\Users\TCT\Desktop\NSProjects\leashed\pcap
               target: /pcap
    
         ports:
