@@ -9,6 +9,7 @@ namespace leashApi.Models
         public DbSet<Picture> Pictures { get; set; }
         public DbSet<PictureDogJoin> PictureDogJoins { get; set;}
         public DbSet<Dog> Dogs { get; set; }
+        public DbSet<TokenSub> TokenSubs {get; set;}
         public DbSet<UserData> UserData { get; set; }
         public ParkContext(DbContextOptions<ParkContext> options)
             : base(options)
@@ -27,6 +28,10 @@ namespace leashApi.Models
                 .HasOne<Picture>(pdj => pdj.Picture)
                 .WithMany(m => m.PictureDogJoins)
                 .HasForeignKey( pdj => pdj.PictureId);
+            modelBuilder.Entity<ParkItem>()
+                .HasMany(u => u.ParkGoers)
+                .WithOne(p => p.Park);
+                
         }
        
     }

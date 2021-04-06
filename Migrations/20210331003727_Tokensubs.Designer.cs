@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using leashApi.Models;
@@ -9,9 +10,10 @@ using leashApi.Models;
 namespace leashApi.Migrations
 {
     [DbContext(typeof(ParkContext))]
-    partial class ParkContextModelSnapshot : ModelSnapshot
+    [Migration("20210331003727_Tokensubs")]
+    partial class Tokensubs
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -102,6 +104,12 @@ namespace leashApi.Migrations
                     b.Property<int>("UserDataId")
                         .HasColumnType("integer");
 
+                    b.Property<string[]>("canEdit")
+                        .HasColumnType("text[]");
+
+                    b.Property<string[]>("canRead")
+                        .HasColumnType("text[]");
+
                     b.HasKey("Id");
 
                     b.HasIndex("UserDataId");
@@ -131,22 +139,12 @@ namespace leashApi.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<int?>("PictureId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("PictureId1")
-                        .HasColumnType("integer");
-
                     b.Property<string>("tokenSub")
                         .IsRequired()
                         .HasColumnType("character varying(255)")
                         .HasMaxLength(255);
 
                     b.HasKey("Id");
-
-                    b.HasIndex("PictureId");
-
-                    b.HasIndex("PictureId1");
 
                     b.ToTable("TokenSubs");
                 });
@@ -163,20 +161,20 @@ namespace leashApi.Migrations
                         .HasColumnType("character varying(255)")
                         .HasMaxLength(255);
 
-                    b.Property<long?>("ParkId")
+                    b.Property<long?>("ParkItemId")
                         .HasColumnType("bigint");
 
-                    b.Property<int>("TokenSubId")
-                        .HasColumnType("integer");
+                    b.Property<string>("TokenSub")
+                        .IsRequired()
+                        .HasColumnType("character varying(255)")
+                        .HasMaxLength(255);
 
                     b.Property<int?>("UserDataId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ParkId");
-
-                    b.HasIndex("TokenSubId");
+                    b.HasIndex("ParkItemId");
 
                     b.HasIndex("UserDataId");
 
@@ -216,28 +214,11 @@ namespace leashApi.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("leashApi.Models.TokenSub", b =>
-                {
-                    b.HasOne("leashApi.Models.Picture", null)
-                        .WithMany("canEdit")
-                        .HasForeignKey("PictureId");
-
-                    b.HasOne("leashApi.Models.Picture", null)
-                        .WithMany("canRead")
-                        .HasForeignKey("PictureId1");
-                });
-
             modelBuilder.Entity("leashApi.Models.UserData", b =>
                 {
-                    b.HasOne("leashApi.Models.ParkItem", "Park")
+                    b.HasOne("leashApi.Models.ParkItem", null)
                         .WithMany("ParkGoers")
-                        .HasForeignKey("ParkId");
-
-                    b.HasOne("leashApi.Models.TokenSub", "TokenSub")
-                        .WithMany()
-                        .HasForeignKey("TokenSubId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ParkItemId");
 
                     b.HasOne("leashApi.Models.UserData", null)
                         .WithMany("friends")

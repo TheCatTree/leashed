@@ -21,12 +21,15 @@ namespace leashApi.Models
         public int UserDataId { get; set;}
 
         public IList<PictureDogJoin> PictureDogJoins {get; set;}
-        public string[] canRead {get; set;}
-        public string[] canEdit {get; set;}
+        public IList<TokenSub> canRead {get; set;}
+        public IList<TokenSub>  canEdit {get; set;}
         
 
         public Picture(){
             PictureDogJoins = new Collection<PictureDogJoin>();
+            canRead = new List<TokenSub>();
+            canEdit = new List<TokenSub>();
+
             
         }
     }

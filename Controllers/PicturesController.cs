@@ -55,7 +55,7 @@ namespace leashApi.Controllers
             var decriptedToken = securityTokenHandler.ReadJwtToken(token);
             var claims = decriptedToken.Claims;
             var sub = claims.First(c => c.Type == "sub").Value;
-            var user = await _context.UserData.Where(x => x.TokenSub == sub).FirstOrDefaultAsync();
+            var user = await _context.UserData.Where(x => x.TokenSub.tokenSub == sub).FirstOrDefaultAsync();
             picture.UserDataId = user.Id;
             _context.Pictures.Add(picture);
             await _context.SaveChangesAsync();
@@ -75,7 +75,7 @@ namespace leashApi.Controllers
                 var decriptedToken = securityTokenHandler.ReadJwtToken(token);
                 var claims = decriptedToken.Claims;
                 var sub = claims.First(c => c.Type == "sub").Value;
-                var user = await _context.UserData.Where(x => x.TokenSub == sub).FirstOrDefaultAsync();
+                var user = await _context.UserData.Where(x => x.TokenSub.tokenSub == sub).FirstOrDefaultAsync();
                 
 
                 if(!Helpers.canAccess(picture,user,Helpers.AccessLevel.read)){
@@ -98,7 +98,7 @@ namespace leashApi.Controllers
             var decriptedToken = securityTokenHandler.ReadJwtToken(token);
             var claims = decriptedToken.Claims;
             var sub = claims.First(c => c.Type == "sub").Value;
-            var user = await _context.UserData.Where(x => x.TokenSub == sub).FirstOrDefaultAsync();
+            var user = await _context.UserData.Where(x => x.TokenSub.tokenSub == sub).FirstOrDefaultAsync();
             
             var Surls = new Collection<secureURLResource>();;
             Console.WriteLine("---------------------get pictures-----------------------");

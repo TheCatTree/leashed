@@ -37,7 +37,7 @@ namespace leashApi.Controllers
             var decriptedToken = securityTokenHandler.ReadJwtToken(token);
             var claims = decriptedToken.Claims;
             var sub = claims.First(c => c.Type == "sub").Value;
-            var user = await _context.UserData.Where(x => x.TokenSub == sub).FirstOrDefaultAsync();
+            var user = await _context.UserData.Where(x => x.TokenSub.tokenSub == sub).FirstOrDefaultAsync();
             Console.WriteLine("---------------------sub-----------------------");
             Console.WriteLine(sub);
            if (user == null)
@@ -71,7 +71,7 @@ namespace leashApi.Controllers
             var decriptedToken = securityTokenHandler.ReadJwtToken(token);
             var claims = decriptedToken.Claims;
             var sub = claims.First(c => c.Type == "sub").Value;
-            var user = await _context.UserData.Where(x => x.TokenSub == sub).FirstOrDefaultAsync();
+            var user = await _context.UserData.Where(x => x.TokenSub.tokenSub == sub).FirstOrDefaultAsync();
             Console.WriteLine("---------------------sub-----------------------");
             Console.WriteLine(sub);
            if (user == null)
@@ -112,7 +112,7 @@ namespace leashApi.Controllers
             var decriptedToken = securityTokenHandler.ReadJwtToken(token);
             var claims = decriptedToken.Claims;
             var sub = claims.First(c => c.Type == "sub").Value;
-            var user = await _context.UserData.Where(x => x.TokenSub == sub).FirstOrDefaultAsync();
+            var user = await _context.UserData.Where(x => x.TokenSub.tokenSub == sub).FirstOrDefaultAsync();
             Console.WriteLine("---------------------sub-----------------------");
             Console.WriteLine(sub);
             Console.WriteLine("---------------------USER FROM POST-----------------------");
@@ -124,7 +124,9 @@ namespace leashApi.Controllers
 
             user = new UserData
             {
-                TokenSub = sub,
+                TokenSub = new TokenSub{
+                tokenSub =  sub
+                },
                 Name = "Not Set Yet"
             };
 
@@ -142,7 +144,7 @@ namespace leashApi.Controllers
             var decriptedToken = securityTokenHandler.ReadJwtToken(token);
             var claims = decriptedToken.Claims;
             var sub = claims.First(c => c.Type == "sub").Value;
-            var user = await _context.UserData.Where(x => x.TokenSub == sub).FirstOrDefaultAsync();
+            var user = await _context.UserData.Where(x => x.TokenSub.tokenSub == sub).FirstOrDefaultAsync();
             var friend = await _context.UserData.Where(x => x.Id == id).FirstOrDefaultAsync();
             if (user == null)
             {
@@ -160,6 +162,32 @@ namespace leashApi.Controllers
             return friend;
         }
 
+        [HttpPost("parkcheckin/{id}")]
+        public async Task<ActionResult<ParkItem>> checkintopark (int id)
+        {
+            var token = await HttpContext.GetTokenAsync("access_token");
+            var securityTokenHandler = new JwtSecurityTokenHandler();
+            var decriptedToken = securityTokenHandler.ReadJwtToken(token);
+            var claims = decriptedToken.Claims;
+            var sub = claims.First(c => c.Type == "sub").Value;
+            var user = await _context.UserData.Where(x => x.TokenSub.tokenSub == sub).FirstOrDefaultAsync();
+            var park = await _context.ParkItems.Where(x => x.Id == id).FirstOrDefaultAsync();
+            if (user == null)
+            {
+                return StatusCode(403, $"No user");
+            }
+            if (park == null)
+            {
+                return StatusCode(403, $"No friend");
+            }
+
+            
+            user.Park = park;
+            await _context.SaveChangesAsync();
+
+            return park;
+        }
+
         [HttpDelete("removeFriend/{id}")]
         public async Task<ActionResult<UserData>> userRemoveFriends(int id)
         {
@@ -168,7 +196,7 @@ namespace leashApi.Controllers
             var decriptedToken = securityTokenHandler.ReadJwtToken(token);
             var claims = decriptedToken.Claims;
             var sub = claims.First(c => c.Type == "sub").Value;
-            var user = await _context.UserData.Where(x => x.TokenSub == sub).FirstOrDefaultAsync();
+            var user = await _context.UserData.Where(x => x.TokenSub.tokenSub == sub).FirstOrDefaultAsync();
             var friend = await _context.UserData.Where(x => x.Id == id).FirstOrDefaultAsync();
             if (user == null)
             {
@@ -186,6 +214,28 @@ namespace leashApi.Controllers
             return CreatedAtAction("PostUserById", new { id = user.Id }, user);
         }
 
+        [HttpDelete("leavepark")]
+        public async Task<ActionResult<UserData>> userLeavePark(int id)
+        {
+            var token = await HttpContext.GetTokenAsync("access_token");
+            var securityTokenHandler = new JwtSecurityTokenHandler();
+            var decriptedToken = securityTokenHandler.ReadJwtToken(token);
+            var claims = decriptedToken.Claims;
+            var sub = claims.First(c => c.Type == "sub").Value;
+            var user = await _context.UserData.Where(x => x.TokenSub.tokenSub == sub).FirstOrDefaultAsync();
+            if (user == null)
+            {
+                return StatusCode(403, $"No user");
+            }
+            
+
+            
+            user.Park = null;
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("PostUserById", new { id = user.Id }, user);
+        }
+
         [HttpPost("{id}")]
         [Authorize(Policy = "IsAdmin")]
         public async Task<ActionResult<UserData>> PostUserById(string sub)
@@ -197,7 +247,9 @@ namespace leashApi.Controllers
             }
             user = new UserData
             {
-                TokenSub = sub
+                TokenSub = new TokenSub{
+                tokenSub =  sub
+                },
             };
 
             _context.UserData.Add(user);

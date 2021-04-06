@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using leashApi.Models;
@@ -9,9 +10,10 @@ using leashApi.Models;
 namespace leashApi.Migrations
 {
     [DbContext(typeof(ParkContext))]
-    partial class ParkContextModelSnapshot : ModelSnapshot
+    [Migration("20210331010123_StringArrayToList")]
+    partial class StringArrayToList
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -163,7 +165,7 @@ namespace leashApi.Migrations
                         .HasColumnType("character varying(255)")
                         .HasMaxLength(255);
 
-                    b.Property<long?>("ParkId")
+                    b.Property<long?>("ParkItemId")
                         .HasColumnType("bigint");
 
                     b.Property<int>("TokenSubId")
@@ -174,7 +176,7 @@ namespace leashApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ParkId");
+                    b.HasIndex("ParkItemId");
 
                     b.HasIndex("TokenSubId");
 
@@ -229,9 +231,9 @@ namespace leashApi.Migrations
 
             modelBuilder.Entity("leashApi.Models.UserData", b =>
                 {
-                    b.HasOne("leashApi.Models.ParkItem", "Park")
+                    b.HasOne("leashApi.Models.ParkItem", null)
                         .WithMany("ParkGoers")
-                        .HasForeignKey("ParkId");
+                        .HasForeignKey("ParkItemId");
 
                     b.HasOne("leashApi.Models.TokenSub", "TokenSub")
                         .WithMany()

@@ -67,7 +67,18 @@ namespace leashApi
             Console.WriteLine("About to make the string for db");
             //Console.WriteLine(Helpers.connectionStringMaker());
             string envVar = Environment.GetEnvironmentVariable("DATABASE_URL");
-            if(!string.IsNullOrEmpty(envVar)){
+            string intergrationTest = Environment.GetEnvironmentVariable("INTERGRATION_TEST");
+            if(!string.IsNullOrEmpty(intergrationTest) && Convert.ToBoolean(intergrationTest)){
+                Console.WriteLine("Intergration test flag == true");
+                services.AddDbContext<ParkContext>(opt =>
+                    opt.UseInMemoryDatabase(databaseName: "ParksDataBase"));
+                services.AddControllers();
+                services.AddScoped<IDbInitializer, DbInitializer> ();
+                services.AddScoped<IPictureRepository, PictureRepository> ();
+
+            }
+            else{
+                if(!string.IsNullOrEmpty(envVar)){
                 Console.WriteLine("Getting connection String from DATABASE_URL");
                 
                 //parse database URL. Format is postgres://<username>:<password>@<host>/<dbname>
@@ -96,7 +107,7 @@ namespace leashApi
                     Console.WriteLine(" -- --");
                 }
 
-            }
+                }
             else{
                 try{ //trying to create and connecft with environemnt variables. This will work build only.
                     Console.WriteLine(" Attempting connection to db with environment vars ");
@@ -127,7 +138,10 @@ namespace leashApi
                     services.AddScoped<IPictureRepository, PictureRepository> ();
                 
                 } 
+             }
+
             }
+            
 
             //services.AddControllers();
         
@@ -163,8 +177,15 @@ namespace leashApi
             using (var scope = scopeFactory.CreateScope ()) {
                     var dbInitializer = scope.ServiceProvider.GetService<IDbInitializer> ();
                 //dbInitializer.Initialize ();
+                try{
                     dbInitializer.SeedData ();
                 }
+                catch(InvalidOperationException e){
+                    Console.WriteLine(" -- Caught exception. Seeding data to database: " + e);
+                    Console.WriteLine(" -- --");
+                    
+                }
+            }
 
             if (env.IsDevelopment())
             {
