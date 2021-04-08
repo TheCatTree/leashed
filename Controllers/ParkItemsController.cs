@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using leashApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
+using AutoMapper;
+using leashed.Controllers.Resources;
 
 namespace leashApi.Controllers
 {
@@ -18,25 +20,30 @@ namespace leashApi.Controllers
     public class ParkItemsController : ControllerBase
     {
         private readonly ParkContext _context;
+        private readonly IMapper _mapper;
 
-        public ParkItemsController(ParkContext context)
+        public ParkItemsController(ParkContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/ParkItems
-        [HttpGet("suburb")]
-        public async Task<ActionResult<IEnumerable<ParkItem>>> GetParkItems()
+        [HttpGet("All")]
+        public async Task<ActionResult<IEnumerable<ParkItemResource>>> GetParkItems()
         {
             Console.Out.WriteLine("Get works");
             Console.Error.WriteLine("get works");
             Console.Out.Flush();
-            return await _context.ParkItems.ToListAsync();
+            var result = await _context.ParkItems.Include(p => p.ParkGoers).ToListAsync();
+            
+            
+            return Ok(_mapper.Map<IList<ParkItem>,IEnumerable<ParkItemResource>>(result));
         }
 
         // GET: api/ParkItems/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ParkItem>> GetParkItem(long id)
+        public async Task<ActionResult<ParkItemResource>> GetParkItem(long id)
         {
             var parkItem = await _context.ParkItems.FindAsync(id);
 
@@ -45,38 +52,40 @@ namespace leashApi.Controllers
                 return NotFound();
             }
 
-            return parkItem;
+            await _context.Entry(parkItem).Collection(p => p.ParkGoers).LoadAsync();
+
+            return Ok(_mapper.Map<ParkItem,ParkItemResource>(parkItem));
         }
 
         // GET: api/ParkItems/Name/"park name"
         [HttpGet("Name/{name}")]
-        public async Task<ActionResult<ParkItem>> GetParkItemByName(string name)
+        public async Task<ActionResult<ParkItemResource>> GetParkItemByName(string name)
         {
-            var parkItem = await _context.ParkItems.FirstOrDefaultAsync(x => x.Name == name);
+            var parkItem = await _context.ParkItems.Include(p => p.ParkGoers).FirstOrDefaultAsync(x => x.Name == name);
 
             if (parkItem == null)
             {
                 return NotFound();
             }
 
-            return parkItem;
+            return Ok(_mapper.Map<ParkItem,ParkItemResource>(parkItem));
         }
 
         // GET: api/ParkItems/suburb/city+name
         //Get list of parks by suburb
         [HttpGet("suburb/{suburb}")]
-        public async Task<ActionResult<IEnumerable<ParkItem>>> GetParkSuburbItem(String suburb)
+        public async Task<ActionResult<IEnumerable<ParkItemResource>>> GetParkSuburbItem(String suburb)
         {
-            var parkItem = await _context.ParkItems.Where( li => 
+            var result = await _context.ParkItems.Where( li => 
                 li.Suburb == suburb
-            ).ToListAsync();
+            ).Include(p => p.ParkGoers).ToListAsync();
          
-            if (parkItem.Count == 0)
+            if (result.Count == 0)
             {
                 return NotFound();
             }
 
-            return parkItem;
+            return Ok(_mapper.Map<IList<ParkItem>,IEnumerable<ParkItemResource>>(result));
 
         }
 
@@ -85,12 +94,17 @@ namespace leashApi.Controllers
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
         [Authorize]
-        public async Task<IActionResult> PutParkItem(long id, ParkItem parkItem)
-        {
+        public async Task<IActionResult> PutParkItem(long id, ParkItemResource parkItemResource)
+        {   
+
+            var parkItem = _mapper.Map<ParkItemResource, ParkItem>(parkItemResource);
+
             if (id != parkItem.Id)
             {
                 return BadRequest();
             }
+
+
 
             _context.Entry(parkItem).State = EntityState.Modified;
 
@@ -118,18 +132,19 @@ namespace leashApi.Controllers
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
         [Authorize]
-        public async Task<ActionResult<ParkItem>> PostParkItem(ParkItem parkItem)
+        public async Task<ActionResult<ParkItemResource>> PostParkItem(ParkItemResource parkItemResource)
         {
+            var parkItem = _mapper.Map<ParkItemResource, ParkItem>(parkItemResource);
             _context.ParkItems.Add(parkItem);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetParkItem", new { id = parkItem.Id }, parkItem);
+            return CreatedAtAction("GetParkItem", new { id = parkItem.Id }, _mapper.Map<ParkItem,ParkItemResource>(parkItem));
         }
 
         // DELETE: api/ParkItems/5
         [HttpDelete("{id}")]
         [Authorize(Policy = "IsAdmin")]
-        public async Task<ActionResult<ParkItem>> DeleteParkItem(long id)
+        public async Task<ActionResult<ParkItemResource>> DeleteParkItem(long id)
         {
             var parkItem = await _context.ParkItems.FindAsync(id);
             if (parkItem == null)
@@ -140,7 +155,7 @@ namespace leashApi.Controllers
             _context.ParkItems.Remove(parkItem);
             await _context.SaveChangesAsync();
 
-            return parkItem;
+            return Ok(_mapper.Map<ParkItem,ParkItemResource>(parkItem));
         }
 
         private bool ParkItemExists(long id)

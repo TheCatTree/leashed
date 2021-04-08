@@ -13,6 +13,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Diagnostics;
 using leashed.Controllers.Resources;
+using AutoMapper;
 
 namespace leashApi.Controllers
 {
@@ -22,10 +23,12 @@ namespace leashApi.Controllers
     public class DogsController : Controller
     {
         private readonly ParkContext _context;
+        private readonly IMapper _mapper;
 
-        public DogsController(ParkContext context)
+        public DogsController(ParkContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         [HttpGet("{id}")]
@@ -38,11 +41,11 @@ namespace leashApi.Controllers
             }
 
 
-            return Ok(dog);
+            return Ok(_mapper.Map<Dog,DogResource>(dog));
         }
 
         [HttpGet("/user/{id}/dogs")]
-        public async Task<ActionResult<IEnumerable<Dog>>> GetUsersDogs(int id){
+        public async Task<ActionResult<IEnumerable<DogResource>>> GetUsersDogs(int id){
 
             var dogs = await _context.Dogs.Where( dog => 
                 dog.UserDataId == id
@@ -50,13 +53,13 @@ namespace leashApi.Controllers
             Console.WriteLine("---------------------------------------------------------------------------------------------------------");
             Console.WriteLine(dogs.Count());
             Console.WriteLine("---------------------------------------------------------------------------------------------------------");
-            return Ok(dogs);
+            return Ok(_mapper.Map<List<Dog>,IList<DogResource>>(dogs));
         }
        
 
         [HttpPost]
         [Authorize]
-        public async Task<ActionResult<Dog>> Postdog([FromBody] DogResource dogData)
+        public async Task<ActionResult<DogResource>> Postdog([FromBody] DogResource dogData)
         {
             Console.WriteLine("Dog post method.");
             if (!ModelState.IsValid){
@@ -75,7 +78,7 @@ namespace leashApi.Controllers
             _context.Dogs.Add(dog);
             await _context.SaveChangesAsync();
             dog = await _context.Dogs.FindAsync(dog.Id);
-            return Ok(dog);
+            return Ok(_mapper.Map<Dog,DogResource>(dog));
         }
 
         [HttpPut("{id}")]
@@ -96,7 +99,7 @@ namespace leashApi.Controllers
             
             
             dog = await _context.Dogs.FindAsync(id);
-            return Ok(dog);
+            return Ok(_mapper.Map<Dog,DogResource>(dog));
         }
 
      

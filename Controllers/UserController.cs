@@ -14,6 +14,8 @@ using System.Security.Claims;
 using System.Diagnostics;
 using leashed.Controllers.Resources;
 using System.Collections.ObjectModel;
+using AutoMapper;
+
 
 namespace leashApi.Controllers
 {
@@ -23,10 +25,12 @@ namespace leashApi.Controllers
     public class UserController : Controller
     {
         private readonly ParkContext _context;
+        private readonly IMapper _mapper;
 
-        public UserController(ParkContext context)
+        public UserController(ParkContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -46,7 +50,7 @@ namespace leashApi.Controllers
             }
 
 
-            return Ok(user);
+            return Ok(_mapper.Map<UserData,UserResource>(user));
         }
 
         [HttpGet("listusers")]
@@ -56,8 +60,7 @@ namespace leashApi.Controllers
             var usersOut = new Collection<UserResource>();
             foreach(UserData user in users){
                 var x = new UserResource();
-                x.Id = user.Id;
-                x.name = user.Name;
+                x = _mapper.Map<UserData,UserResource>(user);
                 usersOut.Add(x);
             }
             return usersOut;
@@ -82,8 +85,7 @@ namespace leashApi.Controllers
             var usersOut = new Collection<UserResource>();
             foreach(UserData friend in user.friends){
                 var x = new UserResource();
-                x.Id = friend.Id;
-                x.name = friend.Name;
+                x = _mapper.Map<UserData,UserResource>(user);
                 usersOut.Add(x);
             }
 
@@ -100,12 +102,12 @@ namespace leashApi.Controllers
             }
 
 
-            return Ok(user);
+            return Ok(_mapper.Map<UserData,UserResource>(user));
         }
 
         [HttpPost]
         [Authorize]
-        public async Task<ActionResult<UserData>> Postuser()
+        public async Task<ActionResult<UserResource>> Postuser()
         {
             var token = await HttpContext.GetTokenAsync("access_token");
             var securityTokenHandler = new JwtSecurityTokenHandler();
@@ -133,11 +135,11 @@ namespace leashApi.Controllers
             _context.UserData.Add(user);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("PostUserById", new { id = user.Id }, user);
+            return CreatedAtAction("PostUserById", new { id = user.Id }, _mapper.Map<UserData, UserResource>(user));
         }
 
         [HttpPost("addFriend/{id}")]
-        public async Task<ActionResult<UserData>> userAddFriends(int id)
+        public async Task<ActionResult<UserResource>> userAddFriends(int id)
         {
             var token = await HttpContext.GetTokenAsync("access_token");
             var securityTokenHandler = new JwtSecurityTokenHandler();
@@ -159,11 +161,11 @@ namespace leashApi.Controllers
             user.friends.Add(friend);
             await _context.SaveChangesAsync();
 
-            return friend;
+            return _mapper.Map<UserData, UserResource>(friend);
         }
 
         [HttpPost("parkcheckin/{id}")]
-        public async Task<ActionResult<ParkItem>> checkintopark (int id)
+        public async Task<ActionResult<ParkItemResource>> checkintopark (int id)
         {
             var token = await HttpContext.GetTokenAsync("access_token");
             var securityTokenHandler = new JwtSecurityTokenHandler();
@@ -174,7 +176,7 @@ namespace leashApi.Controllers
             var park = await _context.ParkItems.Where(x => x.Id == id).FirstOrDefaultAsync();
             if (user == null)
             {
-                return StatusCode(403, $"No user");
+                return StatusCode(403, $"No user" + sub);
             }
             if (park == null)
             {
@@ -184,12 +186,12 @@ namespace leashApi.Controllers
             
             user.Park = park;
             await _context.SaveChangesAsync();
-
-            return park;
+            var result = _mapper.Map<ParkItem, ParkItemResource>(park);
+            return result;
         }
 
         [HttpDelete("removeFriend/{id}")]
-        public async Task<ActionResult<UserData>> userRemoveFriends(int id)
+        public async Task<ActionResult<UserResource>> userRemoveFriends(int id)
         {
             var token = await HttpContext.GetTokenAsync("access_token");
             var securityTokenHandler = new JwtSecurityTokenHandler();
@@ -211,11 +213,11 @@ namespace leashApi.Controllers
             user.friends.Remove(friend);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("PostUserById", new { id = user.Id }, user);
+            return CreatedAtAction("PostUserById", new { id = user.Id }, _mapper.Map<UserData, UserResource>(user));
         }
 
         [HttpDelete("leavepark")]
-        public async Task<ActionResult<UserData>> userLeavePark(int id)
+        public async Task<ActionResult<UserResource>> userLeavePark(int id)
         {
             var token = await HttpContext.GetTokenAsync("access_token");
             var securityTokenHandler = new JwtSecurityTokenHandler();
@@ -233,12 +235,12 @@ namespace leashApi.Controllers
             user.Park = null;
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("PostUserById", new { id = user.Id }, user);
+            return CreatedAtAction("PostUserById", new { id = user.Id }, _mapper.Map<UserData, UserResource>(user));
         }
 
         [HttpPost("{id}")]
         [Authorize(Policy = "IsAdmin")]
-        public async Task<ActionResult<UserData>> PostUserById(string sub)
+        public async Task<ActionResult<UserResource>> PostUserById(string sub)
         {
             var user = await _context.UserData.FindAsync(sub);
             if (user != null)
@@ -255,7 +257,7 @@ namespace leashApi.Controllers
             _context.UserData.Add(user);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("PostUserById", new { id = user.Id }, user);
+            return CreatedAtAction("PostUserById", new { id = user.Id }, _mapper.Map<UserData, UserResource>(user));
         }
 
      

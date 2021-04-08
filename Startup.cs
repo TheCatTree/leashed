@@ -19,6 +19,7 @@ using Npgsql;
 using leashed.helpers;
 using Microsoft.IdentityModel.Logging;
 using leashed.Authorization;
+using AutoMapper;
 
 namespace leashApi
 {
@@ -63,6 +64,7 @@ namespace leashApi
                     options.AddPolicy("IsAdmin", policy => policy.Requirements.Add(new ILeashedAuthorizationHandlerRequirement()));
                 });
                 services.AddSingleton<IAuthorizationHandler, ILeashedAuthorizationHandler>();
+                services.AddAutoMapper(typeof(Startup).Assembly);
             string connectionString = null;
             Console.WriteLine("About to make the string for db");
             //Console.WriteLine(Helpers.connectionStringMaker());
