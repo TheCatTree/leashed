@@ -68,6 +68,7 @@ namespace leashApi.Controllers
             {
                 return NotFound();
             }
+            await _context.Entry(parkItem).Collection(p => p.ParkGoers).LoadAsync();
 
             return Ok(_mapper.Map<ParkItem,ParkItemResource>(parkItem));
         }
