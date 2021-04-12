@@ -18,10 +18,13 @@ namespace leashed.Mapping
             CreateMap<ParkItem,ParkItemResource>();
             CreateMap<UserData, UserResource>()
                 .ForMember(ur => ur.Park, opt => opt.MapFrom(u => u.Park.Id));
+            CreateMap<UserData, int>()
+                .ConstructUsing(u => u.Id);
             CreateMap<Dog,DogResource>();
 
             //API Resource to Domain
             CreateMap<DogResource,Dog>();
+            CreateMap<ParkItemResource,ParkItem>();
             
 
         }

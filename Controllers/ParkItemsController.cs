@@ -41,6 +41,7 @@ namespace leashApi.Controllers
             return Ok(_mapper.Map<IList<ParkItem>,IEnumerable<ParkItemResource>>(result));
         }
 
+
         // GET: api/ParkItems/5
         [HttpGet("{id}")]
         public async Task<ActionResult<ParkItemResource>> GetParkItem(long id)
@@ -134,7 +135,18 @@ namespace leashApi.Controllers
         [Authorize]
         public async Task<ActionResult<ParkItemResource>> PostParkItem(ParkItemResource parkItemResource)
         {
-            var parkItem = _mapper.Map<ParkItemResource, ParkItem>(parkItemResource);
+            //var parkItem = _mapper.Map<ParkItemResource, ParkItem>(parkItemResource);
+            var parkItem = new ParkItem{
+                Name = parkItemResource.Name,
+                IsLeashed = parkItemResource.IsLeashed,
+                RoadFront = parkItemResource.RoadFront,
+                Suburb = parkItemResource.Suburb,
+                City = parkItemResource.City,
+                Country = parkItemResource.Country,
+                ParkGoers = _mapper.Map<IList<UserResource>,IList<UserData>>(parkItemResource.ParkGoers),
+
+            };
+
             _context.ParkItems.Add(parkItem);
             await _context.SaveChangesAsync();
 

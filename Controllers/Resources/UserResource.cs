@@ -15,6 +15,7 @@ namespace leashed.Controllers.Resources
         public ICollection<PictureResource> Pictures {get; set;}
         public ICollection<DogResource> Dogs {get; set;}
         public ICollection<int> friends {get; set;}
+        public PrivacyLevel PrivacyLevel {get; set;}
         public int Park {get; set;}
 
         public UserResource()
@@ -23,6 +24,13 @@ namespace leashed.Controllers.Resources
             Dogs = new Collection<DogResource>();
             friends = new Collection<int>();
         }
+
+    }
+
+    public class UserResourcePublic 
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
 
     }
 

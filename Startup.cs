@@ -20,6 +20,7 @@ using leashed.helpers;
 using Microsoft.IdentityModel.Logging;
 using leashed.Authorization;
 using AutoMapper;
+using leashed.Services;
 
 namespace leashApi
 {
@@ -145,7 +146,8 @@ namespace leashApi
             }
             
 
-            //services.AddControllers();
+            services.AddHttpContextAccessor();
+            services.AddTransient<ITokenUserResolverService, TokenUserResolverService>();
         
         }
 

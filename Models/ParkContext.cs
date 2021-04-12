@@ -31,6 +31,11 @@ namespace leashApi.Models
             modelBuilder.Entity<ParkItem>()
                 .HasMany(u => u.ParkGoers)
                 .WithOne(p => p.Park);
+            modelBuilder.Entity<UserData>()
+                .Property(e => e.PrivacyLevel)
+                .HasConversion(
+                    v => v.ToString(),
+                    v => (PrivacyLevel)System.Enum.Parse(typeof(PrivacyLevel), v));
                 
         }
        

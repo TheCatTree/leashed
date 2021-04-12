@@ -19,6 +19,12 @@ namespace leashed.Authorization
 
     public class ILeashedAuthorizationHandlerRequirement : IAuthorizationRequirement
     {
-        public string ValidPermission = "delete:park";
+        public string ValidPermission = Permissions.Admin;
     }
+
+    public class Permissions{
+        public const string Admin = "role:admin";
+        
+    }
+    
 }

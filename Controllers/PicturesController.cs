@@ -84,7 +84,7 @@ namespace leashApi.Controllers
             }
             Console.WriteLine("---------------------get picture-----------------------");
 
-            secureURLResource pictureResource = uploadImageURL(picture.Key, 1);
+            secureURLResource pictureResource = uploadImageURL(picture.Key, 72);
             pictureResource.Id = picture.Id;
 
             return pictureResource;
@@ -111,7 +111,7 @@ namespace leashApi.Controllers
                     }
                 }
                 var p = picture.Key;
-                var x = getImageURL(p, 1);
+                var x = getImageURL(p, 72);
                 x.Id = picture.Id;
                 Surls.Add(x);
             }
@@ -136,6 +136,8 @@ namespace leashApi.Controllers
         {   
             return Helpers.makeImageURL(key, duration, HttpMethod.Get);
         }
+
+        
 
         
 
